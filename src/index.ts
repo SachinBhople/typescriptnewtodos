@@ -13,13 +13,15 @@ const PORT: number = parseInt(process.env.PORT || "5000", 10);
 
 app.use(express.json())
 app.use(cookieparser())
-app.use(express.static(path.join(__dirname, "src", "dist")));
+const distPath = path.join(__dirname, '..', 'dist')
+app.use(express.static(distPath));
 app.use(cors({ origin: true, credentials: true }))
 app.use("/api", router)
 app.use("/api/auth", authrouter)
 app.use('*', (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, 'src', 'dist', 'index.html'));
+    res.sendFile(path.join(distPath, 'index.html'));
 });
+
 
 mongoose.connect(MONGO_URL)
 
