@@ -43,7 +43,7 @@ const todoSchema: Schema = new Schema(
         isCompleted: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     {
         timestamps: true,

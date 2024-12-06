@@ -6,8 +6,10 @@ import router from "./routes/todo.routes";
 import authrouter from "./routes/auth.routes";
 import cookieparser from "cookie-parser"
 import path from "path"
+import { app, httpServer } from "./socket/socket";
 dotenv.config();
-const app = express()
+
+// const app = express()
 const MONGO_URL: string = process.env.MONGO_URL || ""
 const PORT: number = parseInt(process.env.PORT || "5000", 10);
 
@@ -29,7 +31,7 @@ mongoose.connect(MONGO_URL)
 
 mongoose.connection.once("open", () => {
     console.log("MONGO DB CONNTECTED");
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
         console.log("server runinng");
     })
 })

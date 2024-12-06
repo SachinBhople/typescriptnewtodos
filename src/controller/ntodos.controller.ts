@@ -5,7 +5,7 @@ import projectUpload from "../utils/upload"
 import cloudinary from "../utils/cloudanary.config"
 import { todoSchma } from "../middleware/authValidation"
 import path from "path"
-import { log } from "util"
+import { io } from "../socket/socket"
 
 
 
@@ -51,9 +51,11 @@ export const addTodos = asyncHandler(async (req: Request, res: Response): Promis
             cloudinary.uploader.upload(req.file.path,)
                 .then(async ({ secure_url }) => {
                     console.log(secure_url, "secure_url");
+
                     images = secure_url;
                     await Todo.create({ isCompleted, description, title, hero: images, message, skills, taskType, priority })
-
+                    const result = await Todo.find()
+                    io.emit("blog-fetch", result)
                     res.json({ message: "todo create  succes" })
                 })
                 .catch(error => {
@@ -63,7 +65,9 @@ export const addTodos = asyncHandler(async (req: Request, res: Response): Promis
 
         } else {
             await Todo.create({ isCompleted, description, title, message, skills, taskType, priority })
-
+            const result = await Todo.find()
+            io.emit("blog-fetch", result)
+            res.json({ message: "todo create  succes" })
         }
 
     })
@@ -101,6 +105,8 @@ export const deleteTodos = asyncHandler(async (req: Request, res: Response): Pro
 
 
         await Todo.findByIdAndDelete(id);
+        const dresult = await Todo.find()
+        io.emit("blog-fetch", dresult)
         res.json({ message: "Todo deleted successfully" });
     });
 });
@@ -131,12 +137,6 @@ export const updateTodos = asyncHandler(async (req: Request, res: Response): Pro
             return res.status(404).json({ message: "Todo not found" });
         }
         console.log(req.file);
-        // if (req.file) {
-        //     const { secure_url } = await cloudinary.uploader.upload(req.file.path)
-        //     await Todo.findByIdAndUpdate(id, { isCompleted, description, hero: secure_url, title, message, skills, taskType, priority })
-        // } else {
-        //     await Todo.findByIdAndUpdate(id, { isCompleted, description, title, message, skills, taskType, priority })
-        // }
         let hero
         if (req.file) {
             cloudinary.uploader.upload(req.file.path)
@@ -151,7 +151,8 @@ export const updateTodos = asyncHandler(async (req: Request, res: Response): Pro
         } else {
             await Todo.findByIdAndUpdate(id, { title, description, isCompleted, priority, skills, taskType, message })
         }
-
+        const dresult = await Todo.find()
+        io.emit("blog-fetch", dresult)
         res.json({ message: "todo Update  succes" })
     })
 })
